@@ -85,7 +85,7 @@ if (isset($rebuild)) {
 	while($conf = $confres->fetchrow()) {
 		$cout .= "zone \"" . $conf[0] . "\" {
 			type master;
-			file \"" . preg_replace('/\//','-',$conf[0]) . "\";
+			file \"" . $_CONF['path'] . preg_replace('/\//','-',$conf[0]) . "\";
 		};\n\n";
 	}
 	$fd = fopen($_CONF['conf'],"w");
