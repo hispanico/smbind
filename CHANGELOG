@@ -1,0 +1,111 @@
+Changes since version 0.4.8:
+	* Fixed SF Bug #30 "Zone overwrite", added a if(file_exists()) test in zoneadd.php; thanks to anonymous SF user Chris for reporting.
+	* Fixed SF Bug #31 "trailing dot parsed as wrong", added a preg_replace() to remove /.$/; thanks to Michael Bravo.
+	* Updated the contrib directory for SF Bug #35 "import.php is totally broken", blindly added the attached file from SF user Lazy.
+	* Fixed SF Bug #39 "bug in src/include.php", added function limit() { (...) global $dbtype; } to include.php; thanks to John Rushford.
+	* Fixed SF Bug #41 "commit.php (smbind 0.4.8) + named-checkzone (9.7.3) bug". We now write the entire zone file and check it at the end; thanks to Nedzad Campara.
+	* Removed the record-by-record check. We cannot reasonably resolve RR deps nor predict what new versions named-checkzone might make incompatible with partially-written zone files.
+	* Added named-checkzone output data to the "Commit changes" page.
+	* Added quickstart guide for users using Red Hat Enterprise Linux or CentOS 6-based machines.
+	* Fixed tabbing for the NS1 and NS2 resource records written to the zone file.
+	* Resolved "Smarty Compiler: Syntax error in template" error affecting all Smarty template includes; tested with Smarty 3.1.19.
+
+Changes since version 0.4.7:
+	* Fixed SF Bug #3055095 "Sql injection on login"
+	* Fixed SF Bug #1995262 "include.php should be added to all pages"
+	* Fixed SF Bug #1685484 "LIMIT clause and postgres"
+	* Fixed SF Bug #1685482 "configtest.php"
+	* Added contrib/import.php for main project.
+
+Changes since version 0.4.6.2:
+	* configtest.php users SQL table schema conflict with test bug #1610362. Thanks to nickswanjan.
+	* Fixed zone table schema default owner id, continuation of ownership transfer bug fixed in 0.4.4.
+	* Zone list pagination.
+	* Record list pagination.
+	* Removed confirmation pages.
+	* Replaced confirmation pages with visual Commit indicator.
+	* Removed "The zone will not be active until you add resource records to it." message. Incorrect.
+	* Updated help message for new zone; adds SOA and NS records, too.
+	* Fixed bug where new zone wouldn't automatically be owned by the current user.
+	* Added PEAR getDebugInfo to is_error() to better debug SQL problems.
+	* Added style to all hyperlinks.
+	* Validated HTML using Tidy.
+
+Changes since version 0.4.6.1:
+	* Extra fixes for record sort order.
+
+Changes since version 0.4.6:
+	* Made the MX field in a record list only appear for MX records.
+
+Changes since version 0.4.5:
+	* General filesystem security improvements to configtest.php, bug #1594788.
+	* Fixed record sort order bug #1570702.
+	* Fixed named-check* permissions check in configtest.php, bug #1580620.
+		http://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=200465
+	* Fixed default admin account deletion bug #1589876.
+	* Default database user specified in config.php is now "smbind" instead of "root". 
+
+Changes since version 0.4.4:
+	* Source code restructured.
+	* Added new options to zone creation form for creating template records.
+
+Changes since version 0.4.3:
+	* Added closing tags to config.php and commit.php
+	* Fixed user delegation bug #1515542. Thanks to anonymous SF user.
+	* Updated the template files for clearer explanations and better grammar.
+	* Fixed bug in the user delete mechanism to transfer ownership to admin. admin id == 1, not 0.
+	* Updated SQL template files for MySQL and PostgreSQL related to above change.
+	* Added better error handling of blank passwords, blank usernames, and blank zone names.
+	* Added page titles to each template (that I could find) where they were missing.
+	* Fixed bug where deleted zones were removed from the database, but not the config file #1520939.
+
+Changes since version 0.4.2:
+	* Now properly /dev/nulls output from rndc reload. Forgot about this one for quite a while.
+	* Added ONLOAD script to position the cursor in the username field on the login page.
+
+Changes since version 0.4.1:
+	* Bug in commit.php, improper handling of zone names containg / character. Thanks to Per Olsson.
+	* Bug in index.php, where changed zone owners didn't appear in UPDATE SQL. Thanks to dylanswift.
+	* Bug in index.php, with serial number rollover, now forces an increment. Thanks to dylanswift.
+
+Changes since version 0.4:
+	* Bug in logout.tpl, relative path issue. Thanks to noismaster.
+	* Bug in configtest.php, didn't up config value for locating rndc. Thanks to noismaster.
+
+Chagnes since version 0.3.1:
+	* Serial numbers compliant with RFC1912 2.2.
+	* Initial RETRY/EXPIRE/TTL values compliant with RFC1912.
+	* SRV record automatic dot-appending.
+	* rndc status on main page.
+	* Added bad or uncommitted record warnings to main page.
+	* More SQL code cleaning, reason()
+	* New interface, fonts
+	* Works in a chroot jail
+	* configtest.php script
+	* Updated installation information
+	* Options menu
+
+Changes since version 0.3.0:
+	* Added support for committing changes to BIND directly from the web interface.
+	* Converted update-bind.pl to commit.php
+	* Converted php scripts from mysql*() to PEAR DB.
+	* Made table structure portable.
+	* Fixed change password for other user match verification.
+	* Converted files to UNIX linebreaks, cleaned some code for line wrapping issues.
+
+Changes since version 0.2.1:
+	* Added delete checkboxes.
+	* Added record-level error checking with named-checkzone.
+	* Added record and zone validity checking and database fields.
+	* Added support for '@'/blank hosts or destinations.
+	* Fixed NS record and '.' appending. 
+
+Changes since version 0.2:
+	* Fixed password change for administrator.
+	* Added feature: Change own password.
+	* Fixed some rights on the files.
+	* Cleaned up some code.
+
+Changes since version 0.1:
+	* Fixed serial-number update on change.
+	* Added support for advanced datatypes.

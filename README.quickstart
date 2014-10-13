@@ -1,0 +1,78 @@
+This is a quickstart guide intended for users of Red Hat Enterprise Linux or CentOS 6 (or related derivatives).
+You should be able to paste these commands in, taking special care to read the commented lines, to get you up and running.
+This has been tested successfully with a vanilla, stripped-down RHEL 6.4 system. 
+
+# Install and start the LAMP stack and BIND DNS server. 
+sudo yum -y install httpd.x86_64 httpd-tools.x86_64 apr.x86_64 apr-util.x86_64 apr-util-ldap.x86_64 mailcap.noarch \
+                    mysql.x86_64 mysql-server.x86_64 perl-DBD-MySQL.x86_64 perl-DBI.x86_64 \
+                    php.x86_64 php-cli.x86_64 php-common.x86_64 php-pdo.x86_64 php-mysql.x86_64 php-pear.noarch \
+                    bind.x86_64 portreserve.x86_64
+sudo service httpd start
+sudo chkconfig httpd on
+sudo service mysqld start
+sudo chkconfig mysqld on
+sudo service named start
+sudo chkconfig named on
+
+# Configure the BIND server.
+sudo sh -c "echo OPTIONS=\"-4\" >>/etc/sysconfig/named"
+sudo sed -i /etc/named.conf -e "/listen-on port 53/s/127\.0\.0\.1/any/"
+sudo sed -i /etc/named.conf -e "s/listen-on-v6.*$/empty-zones-enable yes;/"
+sudo sed -i /etc/named.conf -e "/allow-query/s/localhost/any/"
+
+# Configure the MySQL database.
+mysql -u root <<EOF
+drop database test;
+create database smbind;
+update mysql.user set password=password('changeme') where user='root' and host='localhost';
+delete from mysql.user where password='';
+insert into mysql.user (host, user, password) values ('localhost', 'smbind', password('changeme'));
+insert into mysql.db (host, user, db, select_priv, insert_priv, update_priv, delete_priv, create_priv, drop_priv)
+                   values ('localhost', 'smbind', 'smbind', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y');
+flush privileges;
+EOF
+mysqladmin -u smbind -pchangeme ping
+
+# Create the MySQL tables.
+curl -s http://hivelocity.dl.sourceforge.net/project/smbind/smbind/0.4.8.1/smbind-0.4.8.1.tar.gz | \
+tar Ozxf - smbind-0.4.8.1/smbind-mysql.sql | \
+mysql -u smbind -D smbind -pchangeme
+mysql -u smbind -D smbind -pchangeme <<EOF
+show tables;
+EOF
+
+# Install the PHP web interface.
+sudo chown apache.apache /var/www/html
+curl -s http://hivelocity.dl.sourceforge.net/project/smbind/smbind/0.4.8.1/smbind-0.4.8.1.tar.gz | \
+sudo -u apache tar zxvf - -C /var/www/html --strip-components=2 smbind-0.4.8.1/php
+sudo -u apache sed -i /var/www/html/config.php -e '/db_pass/s/""/"changeme"/g'
+
+# Install Smarty and Pear-DB
+sudo mkdir /usr/share/smarty
+curl -s http://www.smarty.net/files/Smarty-3.1.19.tar.gz | \
+sudo tar zxvf - -C /usr/share/smarty --strip-components=2 Smarty-3.1.19/libs
+sudo chown -R root.root /usr/share/smarty
+sudo pear channel-update pear.php.net
+sudo pear install DB
+
+# Configure directories, ownership, permissions.
+sudo grep "^SELINUX=enforcing" /etc/selinux/config >/dev/null && sudo sed -i /etc/selinux/config -e "s/^SELINUX=enforcing/SELINUX=permissive/" && sudo setenforce 0
+sudo usermod -aG named apache
+sudo service httpd restart
+sudo mkdir /etc/smbind
+sudo chgrp named /etc/smbind /var/named
+sudo chmod g+rwx /etc/smbind /var/named
+sudo sh -c "cat - >>/etc/named.conf <<EOF
+include \"/etc/smbind/smbind.conf\";
+EOF"
+sudo touch /etc/smbind/smbind.conf
+sudo chown apache.apache /etc/smbind/smbind.conf
+sudo chmod 0644 /etc/smbind/smbind.conf
+
+# Check the configuration.
+# URL: http://localhost.localdomain/src/configtest.php
+
+# Access the web interface.
+# URL: http://localhost.localdomain/
+# Username: admin
+# Password: admin

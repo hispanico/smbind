@@ -1,0 +1,11 @@
+==========
+UPGRADING
+==========
+
+In this release, the files in src/ and templates/ have been updated from the previous release.
+
+To upgrade, replace all the src/* and templates/* files that you have installed with the ones from this version. No changes to the database table structure or config file format have been made with this release.
+
+For example:
+cp -Rp php/src/* /var/www/html/src
+cp -Rp php/templates/* /var/www/html/templates

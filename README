@@ -1,0 +1,38 @@
+Simple Management for BIND
+ by Ole Myhre <ole@norlinux.com>, Ben Lentz <ben.lentz@gmail.com>
+
+* What is smbind?
+
+  Smbind is a tool for people who want to administer their
+  BIND DNS servers from a web interface, and delegate zones to users.
+
+* Why use smbind versus the 250 other web-based BIND management softwares on SourceForge?
+
+  smbind is 100% PHP, with no dependancy on perl (not that I don't love perl!). 
+  It also features error checking using bind's built-in named-checkconf and 
+  named-checkzone binaries, removing single records that do not pass their criteria,
+  and writing only the valid records to the zone files.
+
+* Does smbind use cron, like the 250 other web-based BIND management softwares on SourceForge?
+  No way. Changes are committed out of the database on-the-fly, on-demand from the
+  web interface. Changes are instant, so there's no waiting around for cron to kick in.
+  Changes to the zone data are applied without bringing BIND down, through the use of 
+  "rndc reload". This means changes can be applied while BIND is "hot".
+
+* Why use smbind, and not the SQL-based PowerDNS?
+
+  BIND is todays standard for DNS-servers. It's stable, robust and secure.
+  Smbind extends BIND's functionality with a SQL backend. You can make changes
+  directly in SQL, and let smbind update your zone files.
+
+* What databases are supported?
+
+  All of them :)
+  Smbind uses php's PEAR DB modules. Any database supported by PEAR DB will
+  be work with Smbind. See http://pear.php.net/package/DB for a complete list.
+
+* Where did the template and/or graphics come from?
+
+  The html template is based on "Blue Curve" from the http://www.ubooty.co.uk/ site.
+  The binary globe graphic is based on "Data across the globe" by Daniel Gilbey 
+  from http://www.dreamstime.com/

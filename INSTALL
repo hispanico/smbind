@@ -1,0 +1,73 @@
+Simple Management for BIND version 0.4.8.1.
+
+############
+############
+INSTALLATION
+############
+############
+You will need to create a database, table structure, install and configure the PHP scripts, and modify your named.conf. You will need to adjust permissions on your system so that your web server user (www, apache, httpd, nobody, etc.) can read and write various files relating to BIND, such as rndc.
+
+Provided is a configtest.php script that will test permissions on everything to ensure that your configuration will work. It will be located at http://localhost.localdomain/src/configtest.php
+
+############
+DATABASE
+############
+1. Create the smbind database.
+[MySQL]		mysqladmin -u dbuser -p create smbind
+[PG]		createdb smbind
+
+2. Create the smbind tables.
+[MySQL]		mysql -p -u dbuser -D smbind < smbind-mysql.sql
+[PG]		psql -U dbuser -d smbind < smbind-pg.sql
+
+Other database servers are possible, but may require custom table schemas.
+
+############
+WEB SERVER
+############
+3. Copy the contents of the php directory to a web server directory.
+[example]	cp -Rp php/* /var/www/html/
+
+4. Secure the config file (private readable) and template_c (writable) directories. Your web server may not run as apache, it may run as www, httpd, nobody, or something entirely different.
+[example]	chown root.apache config.php template_c
+[example]	chmod 640 config.php
+[example]	chmod 775 template_c
+
+The configtest.php script will verify that this is working.
+
+5. Edit config.php, setting your database information and the locations of your named-checkconf, named-checkzone, and rndc binaries. smbind configuration examples are provided for both normal and chroot jailed BIND setups.
+
+6. Download the latest version of Smarty from http://smarty.php.net/. Untar the file, and copy the libs folder to the location specified in the smarty_path option in the config file.
+
+[example]	mkdir /usr/share/smarty
+[example]	tar zxvf Smarty-2.6.1.tar.gz
+[example]	cp -R ./Smarty-2.6.1/libs/* /usr/share/smarty)
+
+############
+BIND
+############
+
+7. Add the user that runs your web server to the group that runs the BIND server. This will allow BIND to access it's files, while also allowing your web server to update and manage them. The example below assumes that apache is running as "apache" and that BIND is running as "named". Apache must then be restarted.
+[example]	usermod -G named apache
+[example]	/etc/rc.d/init.d/httpd restart
+
+8. Create a directory for the smbind zone file.
+[example]	mkdir /etc/smbind
+[example]	chown root.named /etc/smbind
+[example]	chmod 775 /etc/smbind
+
+9. Add an include to your named.conf, adding smbind.conf to named.conf.
+[example]	include "/etc/smbind/smbind.conf";
+
+10. Modify the permissions on BIND's zone file directory. Some distributions are broken (fedora) and do not even allow named to write to its own zone directory.
+[example]	chmod 770 /var/named
+
+
+############
+TESTING OUT
+############
+
+11. Fire up a browser and view http://localhost.localdomain/src/configtest.php
+This script will verify that your web server can read and write every where it needs to. If it encounters any permissions problems, read the error message carefully and investigate as instructed. It is assumed that your BIND is running prior to this test.
+
+12. Login to the web interface with the user 'admin' and password 'admin'.
