@@ -15,8 +15,8 @@ if(is_admin()) {
 				   );
 		is_error($res);
 		$res = $dbconnect->query("UPDATE zones " .
-					 "SET updated = 'yes'" .
-					 "LIMIT 1"
+					 "SET updated = 'yes' " .
+					 "WHERE id IN (SELECT id FROM zones LIMIT 1)"
 				   );
 		is_error($res);
 		$res = $dbconnect->query("DELETE FROM records " .
