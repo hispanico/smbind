@@ -179,6 +179,9 @@ function reason($reason) {
 	elseif($reason == "deleteadmin") {
 		return "You may not delete the default admin user.";
 	}
+	elseif($reason == "filenotdelete") {
+		return "The zone file can't delete from file system.";
+	}
 	else {
 		return "An unknown error ocurred.";
 	}
