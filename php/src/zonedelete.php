@@ -26,7 +26,7 @@ if(is_admin()) {
 				   );
 		is_error($res);
 		// delete zonefile
-		// FIXME: zonefile is always delete, even rights are 600 and file is ownd by root
+		// FIXME: zonefile is always delete, even rights are 600 and file is owned by root
 		if (!unlink($_CONF['path'] . preg_replace("/\.$/", "",$zonename))) {
 		    $smarty->assign("pagetitle", "Ooops!");
 		    $smarty->assign("reason", reason("filenotdelete"));
