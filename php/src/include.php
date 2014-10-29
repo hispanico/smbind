@@ -348,13 +348,13 @@ function limit() {
 	$smarty->assign("current_page", $_GET['page']);
 
 	if($_CONF['range'] > 0) {
-		if($_CONF['db_type'] = "mysql") {
+		if($_CONF['db_type'] == "mysql") {
 			$limit = "LIMIT " .
 				(($_GET['page'] * $_CONF['range']) - $_CONF['range']) .
 		       		", " .  
 		         	$_CONF['range'];
 		}
-		elseif($_CONF['db_type'] = "psql") {
+		elseif($_CONF['db_type'] == "psql") {
 			$limit = "OFFSET " .
 				(($_GET['page'] * $_CONF['range']) - $_CONF['range']) .
 				" LIMIT " .
