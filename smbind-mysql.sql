@@ -34,6 +34,7 @@ CREATE TABLE zones (
   retry int NOT NULL default 86400,
   expire int NOT NULL default 2419200,
   ttl int NOT NULL default 604800,
+  nttl int NOT NULL DEFAULT 600,
   valid enum('unknown', 'yes', 'no') not null default 'unknown',
   owner int NOT NULL default 1,
   updated enum('yes', 'no') not null default 'yes',
