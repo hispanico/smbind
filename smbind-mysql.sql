@@ -1,24 +1,31 @@
 CREATE TABLE records (
-  id int auto_increment NOT NULL UNIQUE,
+  id int auto_increment NOT NULL AUTO_INCREMENT,
   zone int NOT NULL default 0,
   host varchar(255) NOT NULL,
-  type varchar(255) NOT NULL,
+  ttl int default null,
+  type varchar(16) NOT NULL,
   pri int NOT NULL default 0,
+  num1 int NOT NULL default 0,
+  num2 int NOT NULL default 0,
+  num3 int NOT NULL default 0,
   destination varchar(255) NOT NULL,
-  valid varchar(255) NOT NULL default 'unknown'
-);
+  txt text default null,
+  valid enum('unknown', 'yes', 'no') not null default 'unknown',
+  primary key(id)
+) ROW_FORMAT=COMPRESSED;
 
 CREATE TABLE users (
-  id int auto_increment NOT NULL UNIQUE,
+  id int auto_increment NOT NULL AUTO_INCREMENT,
   username varchar(255) NOT NULL,
   password varchar(255) NOT NULL,
-  admin varchar(255) NOT NULL default 'no'
+  admin enum('yes', 'no') not null default 'no',
+  primary key(id)
 );
 
 INSERT INTO users VALUES (1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'yes');
 
 CREATE TABLE zones (
-  id int auto_increment NOT NULL UNIQUE,
+  id int auto_increment NOT NULL AUTO_INCREMENT,
   name varchar(255) NOT NULL,
   pri_dns varchar(255),
   sec_dns varchar(255),
@@ -27,9 +34,10 @@ CREATE TABLE zones (
   retry int NOT NULL default 86400,
   expire int NOT NULL default 2419200,
   ttl int NOT NULL default 604800,
-  valid varchar(255) NOT NULL default 'unknown',
+  valid enum('unknown', 'yes', 'no') not null default 'unknown',
   owner int NOT NULL default 1,
-  updated varchar(255) NOT NULL default 'yes'
+  updated enum('yes', 'no') not null default 'yes',
+  primary key(id)
 );
 
 CREATE TABLE options (
@@ -87,3 +95,8 @@ INSERT INTO options VALUES ('prins','normal','ns1.domain.tld');
 INSERT INTO options VALUES ('secns','normal','ns2.domain.tld');
 INSERT INTO options VALUES ('hostmaster','normal','hostmaster.domain.tld');
 
+create table flags (
+  flagname varchar(40) not null unique,
+  flagvalue varchar(40) not null default ''
+);
+insert into flags (flagname, flagvalue) values ('rebuild-slave', '0');
