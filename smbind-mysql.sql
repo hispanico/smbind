@@ -29,6 +29,7 @@ CREATE TABLE zones (
   name varchar(255) NOT NULL,
   pri_dns varchar(255),
   sec_dns varchar(255),
+  ter_dns varchar(255),
   serial int NOT NULL default 0000000000,
   refresh int NOT NULL default 604800,
   retry int NOT NULL default 86400,
@@ -92,9 +93,11 @@ INSERT INTO options VALUES ('TSIG','record','off');
 INSERT INTO options VALUES ('IXFR','record','off');
 INSERT INTO options VALUES ('AXFR','record','off');
 INSERT INTO options VALUES ('MAILB','record','off');
-INSERT INTO options VALUES ('prins','normal','ns1.domain.tld');
-INSERT INTO options VALUES ('secns','normal','ns2.domain.tld');
-INSERT INTO options VALUES ('hostmaster','normal','hostmaster.domain.tld');
+INSERT INTO options VALUES ('500_prins','normal','ns1.domain.tld');
+INSERT INTO options VALUES ('501_secns','normal','ns2.domain.tld');
+INSERT INTO options VALUES ('502_terns','normal','ns3.domain.tld');
+INSERT INTO options VALUES ('510_hostmaster','normal','hostmaster.domain.tld');
+INSERT INTO options VALUES ('650_range','normal','100');
 
 create table flags (
   flagname varchar(40) not null unique,
