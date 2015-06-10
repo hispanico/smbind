@@ -103,4 +103,4 @@ create table flags (
   flagname varchar(40) not null unique,
   flagvalue varchar(40) not null default ''
 );
-insert into flags (flagname, flagvalue) values ('rebuild-slave', '0');
+insert into flags (flagname, flagvalue) values ('rebuild_zones', '0');
