@@ -276,7 +276,7 @@ function sql_config($_CONF, $dbconnect) {
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'range' " .
+			   "WHERE prefkey = '650_range' " .
 			   "AND preftype = 'normal'"
 		);
 	if($query) {
@@ -286,7 +286,7 @@ function sql_config($_CONF, $dbconnect) {
 		global $dbconnect;
         	$res = $dbconnect->query("INSERT INTO options " .
 					 "(prefkey, preftype, prefval) " .
-					 "VALUES ('range', 'normal', '10')"
+					 "VALUES ('650_range', 'normal', '10')"
 					);
 		is_error($res);
 	}
