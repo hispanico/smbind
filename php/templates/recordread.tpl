@@ -17,14 +17,20 @@
   <tr>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Expire:</strong></font></div></td>
     <td><input type="text" name="expire" size="25" class="a1" value="{$zone.expire}"></td>
-<td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>TTL:</strong></font></div></td>
-    <td><input type="text" name="ttl" size="25" class="a1" value="{$zone.ttl}"></td>
+<td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Neg. TTL:</strong></font></div></td>
+    <td><input type="text" name="nttl" size="25" class="a1" value="{$zone.nttl}"></td>
   </tr>
   <tr>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS1:</strong></font></div></td>
     <td><input type="text" name="pri_dns" size="25" class="a1" value="{$zone.pri_dns}"></td>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS2:</strong></font></div></td>
     <td><input type="text" name="sec_dns" size="25" class="a1" value="{$zone.sec_dns}"></td>
+  </tr>
+<tr>
+    <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS3:</strong></font></div></td>
+    <td><input type="text" name="ter_dns" size="25" class="a1" value="{$zone.ter_dns}"></td>
+    <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Default TTL:</strong></font></div></td>
+    <td><input type="text" name="ttl" size="25" class="a1" value="{$zone.ttl}"></td>
   </tr>
   {if $admin == "yes"}
   <tr>
@@ -48,6 +54,7 @@
 <table border="0" cellpadding="0" cellspacing="3">
   <tr>
     <td><font face="Arial,Helvetica" size="-1"><strong>Host</strong></font></td>
+    <td><font face="Arial,Helvetica" size="-1"><strong>TTL</strong></font></td>
     <td><font face="Arial,Helvetica" size="-1"><strong>Type</strong></font></td>
     <td><font face="Arial,Helvetica" size="-1"><strong>Destination</strong></font></td>
     <td><font face="Arial,Helvetica" size="-1"><strong>Valid</strong></font></td>
@@ -59,17 +66,31 @@
 	<input type="text" name="host[{$smarty.section.i.index}]" class="a1" value="{$record[i].host}" size="16">
 	<input type="hidden" name="host_id[{$smarty.section.i.index}]" value="{$record[i].id}">
     </td>
+    <td>
+    <input type="text" name="rttl[{$smarty.section.i.index}]" class="a1" value="{$record[i].ttl}" size="5">
+    </td>
     <td><select name="type[{$smarty.section.i.index}]" class="a1">
       {html_options values=$types selected=$record[i].type output=$types}
     </select></td>
 {if $record[i].type == "MX"}
     <td>
 	<input type="text" name="pri[{$smarty.section.i.index}]" class="a1" size="1" value="{$record[i].pri}">
-	<input type="text" name="destination[{$smarty.section.i.index}]" class="a1" size="27" value="{$record[i].destination}">
+	<input type="text" name="destination[{$smarty.section.i.index}]" class="a1" size="30" value="{$record[i].destination}">
     </td>
+{elseif $record[i].type == "TXT"}
+    <td>
+	<input type="text" name="txt[{$smarty.section.i.index}]" class="a1" size="35" value="{$record[i].txt|escape:'htmlall'}">
+    </td>
+{elseif $record[i].type == "SRV"}
+	<td>
+	<input type="text" name="pri[{$smarty.section.i.index}]" class="a1" size="1" value="{$record[i].pri}">
+	<input type="text" name="num1[{$smarty.section.i.index}]" class="a1" size="1" value="{$record[i].num1}">
+	<input type="text" name="num2[{$smarty.section.i.index}]" class="a1" size="2" value="{$record[i].num2}">
+	<input type="text" name="destination[{$smarty.section.i.index}]" class="a1" size="19" value="{$record[i].destination}">
+	</td>
 {else}
     <td>
-	<input type="text" name="destination[{$smarty.section.i.index}]" class="a1" size="32" value="{$record[i].destination}">
+	<input type="text" name="destination[{$smarty.section.i.index}]" class="a1" size="35" value="{$record[i].destination}">
     </td>
 {/if}
     <td><center>
@@ -85,6 +106,7 @@
   </tr>
   <tr>
     <td><input type="text" name="newhost" class="a1" size="16"></td>
+    <td><input type="text" name="newttl" class="a1" size="5"></td>
     <td><select name="newtype" class="a1">
       {html_options values=$types output=$types}
     </select></td>

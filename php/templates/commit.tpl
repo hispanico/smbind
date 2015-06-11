@@ -11,4 +11,6 @@
 <pre>  {$output[i]}</pre>
 {/section}
 {/if}
+<br />
+{$slave}
 </font>

@@ -10,6 +10,7 @@ if(is_admin())  {
 	$smarty->assign("current_user", $userid);
 	$smarty->assign("pri_dns", $_CONF['pri_dns']);
 	$smarty->assign("sec_dns", $_CONF['sec_dns']);
+	$smarty->assign("ter_dns", $_CONF['ter_dns']);
 	$smarty->assign("template", "newzone.tpl");
 	$smarty->assign("help", help("newzone"));
 	$smarty->assign("menu_button", menu_buttons());

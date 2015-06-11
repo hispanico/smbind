@@ -7,9 +7,11 @@ if((filter("num", $_GET['i'])) &&
    (filter("num", $_POST['retry'])) &&
    (filter("num", $_POST['expire'])) &&
    (filter("num", $_POST['ttl'])) &&
+   (filter("num", $_POST['nttl'])) &&
    (filter("alphanum", $_POST['pri_dns'])) &&
-   (filter("alphanum", $_POST['sec_dns']))) {
-	if(!owner($_GET['i'])) {
+   (filter("alphanum", $_POST['sec_dns'])) &&
+   (filter("alphanum", $_POST['ter_dns']))) {
+	if(!owner($_GET['i']) || $_GET['i'] !== $_POST['zoneid']) {
 		// The user doesn't own this zone.
 		$smarty->assign("pagetitle", "Ooops!");
 		$smarty->assign("reason", reason("notown"));
@@ -22,26 +24,36 @@ if((filter("num", $_GET['i'])) &&
 	$total = $_POST['total'];
 	if($total != 0) {
 		for($x = 0; $x < $total; $x++) {
-			if(($_POST['type'][$x] == "MX") && ($_POST['pri'][$x] == 0)) {
-				$_POST['pri'][$x] = 10;
-			}
-			elseif($_POST['type'][$x] != "MX") {
-				$_POST['pri'][$x] = 0;
-			}
 			if(! $_POST['host'][$x]) {
 				$_POST['host'][$x] = "@";
 			}
 			if(! $_POST['destination'][$x]) {
 				$_POST['destination'][$x] = "@";
 			}
+			$destination = preg_replace("/\.$/", "", $_POST['destination'][$x]);
 			$res = $dbconnect->query("UPDATE records " .
-						 "SET host = '" . $_POST['host'][$x] . "', " .
-						     "type = '" . $_POST['type'][$x] . "', " .
-						     "pri = " . $_POST['pri'][$x] . ", " .
-						     "destination = '" . preg_replace("/\.$/", "", $_POST['destination'][$x]) . "', " .
+						 "SET host = ?, " .
+							 "ttl = ?, " .
+						     "type = ?, " .
+						     "pri = ?, " .
+						     "num1 = ?, " .
+						     "num2 = ?, " .
+						     "num3 = ?, " .
+						     "destination = ?, " .
+						     "txt = ?, " .
 						     "valid = 'unknown' " .
-						 "WHERE id = " . $_POST['host_id'][$x] . " " .
-						 "AND zone = " . $_GET['i']
+						 "WHERE id = ? " .
+						 "AND zone = ?",
+						 array($_POST['host'][$x],
+							strlen($_POST['rttl'][$x] > 0) ? $_POST['rttl'][$x] : null,
+							$_POST['type'][$x], $_POST['pri'][$x],
+							$_POST['num1'][$x],
+							$_POST['num2'][$x],
+							$_POST['num3'][$x],
+							$destination,
+							$_POST['type'][$x] == 'TXT' ? $_POST['txt'][$x] : null,
+							$_POST['host_id'][$x], $_GET['i']
+						)
 					   );
 			is_error($res);
 			if(isset($_POST['delete'][$x])) {
@@ -60,27 +72,16 @@ if((filter("num", $_GET['i'])) &&
 		elseif(! $_POST['newdestination']) {
 			$_POST['newdestination'] = "@";
 		}
-		if(! $_POST['newtype'] == "MX") {
-			$res = $dbconnect->query("INSERT INTO records " .
-							"(zone, host, type, destination) " .
-						 "VALUES(" . $_POST['zoneid'] . ", '" .
-							     $_POST['newhost'] . "', '" .
-							     $_POST['newtype'] . "', '" .
-							     preg_replace("/\.$/", "", $_POST['newdestination']) . "')"
-					   );
+		$res = $dbconnect->query("INSERT INTO records " .
+			"(zone, host, ttl, type, destination, txt) " .
+			"VALUES(?,?,?,?,?,?)",
+			array($_POST['zoneid'], $_POST['newhost'],
+				 strlen($_POST['newttl'] > 0) ? $_POST['newttl'] : null,
+				 $_POST['newtype'],
+				 $_POST['newtype'] == 'TXT' ? '' : preg_replace("/\.$/", "", $_POST['newdestination']),
+				 $_POST['newtype'] == 'TXT' ? $_POST['newdestination'] : null)
+			);
 		is_error($res);
-		}
-		else {
-			$res = $dbconnect->query("INSERT INTO records " .
-							"(zone, host, type, pri, destination) " .
-						 "VALUES(" . $_POST['zoneid'] . ", '" .
-							     $_POST['newhost'] . "', '" .
-							     $_POST['newtype'] . "', " .
-							     "10, '" .
-							     preg_replace("/\.$/", "", $_POST['newdestination']) . "')"
-					   );
-		is_error($res);
-		}
 	
 	}
 	$res = $dbconnect->query("SELECT serial " .
@@ -91,33 +92,45 @@ if((filter("num", $_GET['i'])) &&
 
 	// Serial fixes
 	$old_serial = current($res->fetchRow(0));
-	$serial = date("Ymd") . substr($old_serial + 1, -2);
-	if($serial < $old_serial) {
+	$serial = date("Ymd00");
+	if($serial <= $old_serial) {
 		$serial = $old_serial + 1;
-	}
-	$serial = "serial = '" . $serial . "' ";
-
-	// Owner fixes
-	if(isset($_POST['owner'])) {
-		$owner = "owner = '" . $_POST['owner'] . "', ";
-	}
-	else {
-		$owner = '';
 	}
 
 	$res = $dbconnect->query("UPDATE zones " .
 				 "SET updated = 'yes', " .
-				     "refresh = " . $_POST['refresh'] . ", " .
-				     "retry = " . $_POST['retry'] . ", " .
-				     "expire = " . $_POST['expire'] . ", " .
-				     "ttl = " . $_POST['ttl'] . ", " .
-				     "pri_dns = '" . preg_replace("/\.$/", "", $_POST['pri_dns']) . "', " .
-				     "sec_dns = '" . preg_replace("/\.$/", "", $_POST['sec_dns']) . "', " .
-				     $owner .
-				     $serial .
-				 "WHERE id = " . $_GET['i']
-				);
+				     "refresh = ?, " .
+				     "retry = ?, " .
+				     "expire = ?, " .
+				     "ttl = ?, " .
+				     "nttl = ?, " .
+				     "pri_dns = ?, " .
+				     "sec_dns = ?, " .
+				     "ter_dns = ?, " .
+				     "serial = ? " .
+				 "WHERE id = ?",
+				 array($_POST['refresh'],
+					$_POST['retry'],
+					$_POST['expire'],
+					$_POST['ttl'],
+					$_POST['nttl'],
+					preg_replace("/\.$/", "", $_POST['pri_dns']),
+					preg_replace("/\.$/", "", $_POST['sec_dns']),
+					preg_replace("/\.$/", "", $_POST['ter_dns']),
+					$serial,
+					$_GET['i']
+				)
+			);
 	is_error($res);
+	
+	if (is_admin()) {
+		if(isset($_POST['owner'])) {
+			$res = $dbconnect->query("UPDATE zones set owner = ? where id = ?",
+				array($_POST['owner'], $_GET['i'])
+			);
+			is_error($res);
+		}
+	}
 }
 
 ?>

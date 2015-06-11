@@ -1,95 +1,108 @@
 <?php
 if(!function_exists("is_admin")) { include("include.php"); }
 
+$rebuildq = sql_query("SELECT flagvalue FROM flags WHERE flagname = 'rebuild_zones'");
+$rebuild = $rebuildq[0]['flagvalue'];
+
 $zoneres = $dbconnect->query("SELECT * FROM zones WHERE updated = 'yes'");
 is_error($zoneres);
 
-while($zone = $zoneres->fetchrow()) {
-	$recordres = $dbconnect->query("SELECT * FROM records " . 
-				"WHERE zone = " . $zone[0] . " AND valid != 'no' " .
+while($zone = $zoneres->fetchrow(DB_FETCHMODE_ASSOC)) {
+	$recordres = $dbconnect->query("SELECT * FROM records " .
+				"WHERE zone = " . $zone['id'] . " AND valid != 'no' " .
 				"ORDER BY host, type, pri, destination");
 	is_error($recordres);
-	$out = 
-"\$TTL   " . $zone[8] . "
-@       IN      SOA     " . $zone[2] . ". " . $_CONF['hostmaster'] . ". (
-			" . $zone[4] . " \t; Serial
-			" . $zone[5] . " \t\t; Refresh
-			" . $zone[6] . " \t\t; Retry
-			" . $zone[7] . " \t; Expire
-			" . $zone[8] . ")\t\t; Negative Cache TTL
+	$out =
+"\$TTL   " . $zone['ttl'] . "
+@       IN      SOA     " . $zone['pri_dns'] . ". " . $_CONF['hostmaster'] . ". (
+			" . $zone['serial'] . " \t; Serial
+			" . $zone['refresh'] . " \t\t; Refresh
+			" . $zone['retry'] . " \t\t; Retry
+			" . $zone['expire'] . " \t; Expire
+			" . $zone['nttl'] . ")\t\t; Negative Cache TTL
 ;\n" ;
-	if ($zone[2] != '') {
-		$out .= "@       IN      NS\t\t" . $zone[2] . ".\n";
+	if ($zone['pri_dns'] != '') {
+		$out .= "@       NS\t\t" . $zone['pri_dns'] . ".\n";
 	}
-	if ($zone[3] != '') {
-		$out .= "@       IN      NS\t\t" . $zone[3] . ".\n";	
+	if ($zone['sec_dns'] != '') {
+		$out .= "@       NS\t\t" . $zone['sec_dns'] . ".\n";
 	}
-	$fd = fopen($_CONF['path'] . preg_replace('/\//','-',$zone[1]), "w")
-		or die("Cannot open: " . $_CONF['path'] . preg_replace('/\//','-',$zone[1]));
+	if ($zone['ter_dns'] != '') {
+		$out .= "@       NS\t\t" . $zone['ter_dns'] . ".\n";
+	}
+	$fd = fopen($_CONF['path'] . preg_replace('/\//','-',$zone['name']), "w")
+		or die("Cannot open: " . $_CONF['path'] . preg_replace('/\//','-',$zone['name']));
 	fwrite($fd, $out);
 	fclose($fd);
 
-	$rebuild = "yes";
-
-	while($record = $recordres->fetchrow()) {
-		if($record[3] == "MX") {
-			$pri = $record[4];
+	while($record = $recordres->fetchrow(DB_FETCHMODE_ASSOC)) {
+		if($record['type'] == "MX" || $record['type'] == "SRV") {
+			$pri = $record['pri'];
 		}
 		else {
 			$pri = "";
 		}
-		if(
-			($record[3] == "NS" || 
-			 $record[3] == "PTR" || 
-			 $record[3] == "CNAME" || 
-			 $record[3] == "MX" || 
-			 $record[3] == "SRV") && 
-			($record[5] != "@")) 	{
-			$destination = $record[5] . ".";
+		if ($record['type'] == 'SRV') {
+			$pri .= ' '.$record['num1'].' '.$record['num2'].' ';
 		}
-		elseif($record[3] == "TXT") {
-			$destination = "\"" . $record[5] . "\"";
+		if(
+			($record['type'] == "NS" ||
+			 $record['type'] == "PTR" ||
+			 $record['type'] == "CNAME" ||
+			 $record['type'] == "MX" ||
+			 $record['type'] == "SRV") &&
+			($record['destination'] != "@")) 	{
+			$destination = $record['destination'] . ".";
+		}
+		elseif($record['type'] == "TXT") {
+			$txt = preg_replace('/\\\/', '\\\\\\\\', $record['txt']);
+			$txt = preg_replace('/"/', '\\"', $txt);
+			$txt = implode("\"\n\t\t\t\t\t\"", str_split($txt, 255));
+			$destination = "(\"" . $txt . "\")";
 		}
 		else {
-			$destination = $record[5];
+			$destination = $record['destination'];
 		}
-		$out = $record[2] . "\tIN\t" . $record[3] . "\t" . $pri . "\t" . $destination . "\n";
-		$fd = fopen($_CONF['path'] . preg_replace('/\//','-',$zone[1]), "a");
+		$out = $record['host'] . "\t" . (is_null($record['ttl']) ? '' : $record['ttl']) .
+			"\t" . $record['type'] . "\t" . $pri . "\t" . $destination . "\n";
+		$fd = fopen($_CONF['path'] . preg_replace('/\//','-',$zone['name']), "a");
 		fwrite($fd, $out);
 		fclose($fd);
-		$testres = $dbconnect->query("UPDATE records SET valid = 'yes' " . 
-					"WHERE id = " . $record[0]);
+		$testres = $dbconnect->query("UPDATE records SET valid = 'yes' " .
+					"WHERE id = " . $record['id']);
 		is_error($testres);
 	}
-	$cmd = $_CONF['namedcheckzone'] . " " . $zone[1] . " " . $_CONF['path'] .
-		preg_replace('/\//','-',$zone[1]);
+	$cmd = $_CONF['namedcheckzone'] . " " . $zone['name'] . " " . $_CONF['path'] .
+		preg_replace('/\//','-',$zone['name']);
 	exec($cmd, $output, $exit);
 	if ($exit == 0) {
-		$updateres = $dbconnect->query("UPDATE zones SET updated = 'no', valid = 'yes' " . 
-						"WHERE id = " . $zone[0]);
+		$updateres = $dbconnect->query("UPDATE zones SET updated = 'no', valid = 'yes' " .
+						"WHERE id = " . $zone['id']);
 		is_error($updateres);
-		$rebuild = "yes";
-	}      
+		if (!$rebuild) {
+			$cmd = $_CONF['rndc'] . " reload " . $zone['name'] . "> /dev/null";
+			system($cmd, $exit);
+			if ($exit != 0) { die("$cmd : exit status " . $exit); }
+		}
+	}
 	else {
-		$updateres = $dbconnect->query("UPDATE zones SET updated = 'yes', valid = 'no' " . 
-						"WHERE id = " . $zone[0]);
+		$updateres = $dbconnect->query("UPDATE zones SET updated = 'yes', valid = 'no' " .
+						"WHERE id = " . $zone['id']);
 		is_error($updateres);
 	}
 }
 
-if (isset($rebuild)) {
-	$confres = $dbconnect->query("SELECT name FROM zones ORDER BY name");
-	is_error($confres);
+if ($rebuild) {
+	$zones =& $dbconnect->getAll("SELECT name FROM zones ORDER BY name", null, DB_FETCHMODE_ORDERED);
+	is_error($zones);
 
-	$cout = "";
-	while($conf = $confres->fetchrow()) {
-		$cout .= "zone \"" . $conf[0] . "\" {
-			type master;
-			file \"" . $_CONF['path'] . preg_replace('/\//','-',$conf[0]) . "\";
-		};\n\n";
-	}
 	$fd = fopen($_CONF['conf'],"w");
-	fwrite($fd, $cout);
+	foreach ($zones as $zone) {
+		fwrite($fd, "zone \"" . $zone[0] . "\" {
+			type master;
+			file \"" . $_CONF['path'] . preg_replace('/\//','-',$zone[0]) . "\";
+		};\n\n");
+	}
 	fclose($fd);
 
 	$cmd = $_CONF['namedcheckconf'] . " " . $_CONF['conf'] . " > /dev/null";
@@ -101,9 +114,40 @@ if (isset($rebuild)) {
 	$cmd = $_CONF['rndc'] . " reload > /dev/null";
 	system($cmd, $exit);
 	if ($exit != 0) { die($_CONF['rndc'] . " exit status " . $exit); }
+
+	$slave_message = '';
+	$slaves_rebuilt = true;
+	foreach ($_CONF['slaves'] as $master_addr => $slaves) {
+		$fd = fopen($_CONF['conf_slave'],"w");
+		foreach ($zones as $zone) {
+			fwrite($fd, "zone \"" . $zone[0] . "\" {\n" .
+				"\ttype slave;\n" .
+				"\tfile \"" . $_CONF['path'] . preg_replace('/\//','-',$zone[0]) . "\";\n" .
+				"\tmasters { $master_addr; };\n" .
+				"};\n"
+			);
+		}
+		fwrite($fd, $cout);
+		fclose($fd);
+		foreach ($slaves as $slave) {
+			system('ssh -oConnectTimeout=4 -i ' . $_CONF['slave_ssh_key'] . ' ' .
+				$_CONF['slave_user'].'@'.$slave.' "cat > '. $_CONF['conf_slave'] .'; /usr/sbin/rndc reconfig" < '.$_CONF['conf_slave'], $exit);
+			if ($exit == 0) {
+				$slave_message .= "Updated DNS Slave $slave<br>";
+			} else {
+				$slave_message .= "ERROR: Updating DNS Slave $slave has failed<br>";
+				$slaves_rebuilt = false;
+			}
+		}
+	}
+	if ($slaves_rebuilt) {
+		$rebuildres = $dbconnect->query('update flags set flagvalue=0 where flagname="rebuild_zones"');
+		is_error($rebuildres);
+	}
 }
 $smarty->assign("bad", bad_records($userid));
 $smarty->assign("output", $output);
+$smarty->assign("slave", $slave_message);
 $smarty->assign("pagetitle", "Commit changes");
 $smarty->assign("template", "commit.tpl");
 $smarty->assign("help", help("commit"));

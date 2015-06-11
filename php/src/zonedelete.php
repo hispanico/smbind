@@ -16,11 +16,13 @@ if(is_admin()) {
 					 "WHERE id = " . $_GET['i']
 				   );
 		is_error($res);
-		$res = $dbconnect->query("UPDATE zones " .
+		/* $res = $dbconnect->query("UPDATE zones " .
 					 "SET updated = 'yes' " .
-					 "WHERE id IN (SELECT id FROM zones LIMIT 1)"
+					 "LIMIT 1"
 				   );
-		is_error($res);
+		is_error($res); */
+		$rebuildres = $dbconnect->query('update flags set flagvalue=1 where flagname="rebuild_zones"');
+		is_error($rebuildres);
 		$res = $dbconnect->query("DELETE FROM records " .
 					 "WHERE zone = " . $_GET['i']
 				   );
@@ -35,6 +37,7 @@ if(is_admin()) {
 		    $smarty->assign("menu_button", menu_buttons());
 		    $smarty->display("main.tpl");
 		    die();
+		}
 	}
 	else {  // Bad input from user.
 		$smarty->assign("pagetitle", "Ooops!");

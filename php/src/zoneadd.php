@@ -9,6 +9,7 @@ if(is_admin()) {
 	   (filter("num", $_POST['ttl'], "no")) &&
 	   (filter("alphanum", $_POST['pri_dns'])) &&
 	   (filter("alphanum", $_POST['sec_dns'])) &&
+	   (filter("alphanum", $_POST['ter_dns'])) &&
 	   (filter("num", $_POST['www'])) &&
 	   (filter("num", $_POST['mail'])) &&
 	   (filter("num", $_POST['ftp']))) {
@@ -38,7 +39,7 @@ if(is_admin()) {
 		}
 		if($res->numRows() == 0) {
 			$res = $dbconnect->query("INSERT INTO zones " .
-							"(name, pri_dns, sec_dns, " .
+							"(name, pri_dns, sec_dns, ter_dns, " .
 							"serial, refresh, retry, " .
 							"expire, ttl, owner, " .
 							"updated) " .
@@ -46,6 +47,7 @@ if(is_admin()) {
 							"'" . preg_replace("/\.$/", "", $_POST['name']) . "', " .
 							"'" . preg_replace("/\.$/", "", $_POST['pri_dns']) . "', " .
 							"'" . preg_replace("/\.$/", "", $_POST['sec_dns']) . "', " .
+							"'" . preg_replace("/\.$/", "", $_POST['ter_dns']) . "', " .
 							date("Ymd") . "00, " .
 							$_POST['refresh'] . ", " .
 							$_POST['retry'] . ", " .
@@ -55,6 +57,9 @@ if(is_admin()) {
 							"'yes')"
 					   );
 			is_error($res);
+
+			$rebuildres = $dbconnect->query('update flags set flagvalue=1 where flagname="rebuild_zones"');
+			is_error($rebuildres);
 
 			// Handle default records: Get new zone id
 			if(isset($_POST['www']) || isset($_POST['mail']) || isset($_POST['ftp'])) {

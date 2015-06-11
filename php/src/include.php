@@ -255,24 +255,31 @@ function notadmin($smarty) {
 function sql_config($_CONF, $dbconnect) {
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'hostmaster' " .
+			   "WHERE prefkey = '510_hostmaster' " .
 			   "AND preftype = 'normal'"
 		);
 	$_CONF['hostmaster'] = $query[0]['prefval'];
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'prins' " .
+			   "WHERE prefkey = '500_prins' " .
 			   "AND preftype = 'normal'"
 		 );
 	$_CONF['pri_dns'] = $query[0]['prefval'];
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'secns' " .
+			   "WHERE prefkey = '501_secns' " .
 			   "AND preftype = 'normal'"
 		 );
 	$_CONF['sec_dns'] = $query[0]['prefval'];
+
+	$query = sql_query("SELECT prefval " .
+			   "FROM options " .
+			   "WHERE prefkey = '502_terns' " .
+			   "AND preftype = 'normal'"
+		 );
+	$_CONF['ter_dns'] = $query[0]['prefval'];
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
@@ -315,15 +322,16 @@ function sql_config($_CONF, $dbconnect) {
 function menu_buttons() {
 	global $userid;
 
-	$zresult = sql_query("SELECT id FROM zones WHERE updated = 'yes'");
-	if(count($zresult) == 0) {
+	$zresult1 = sql_query("SELECT id FROM zones WHERE updated = 'yes'");
+	$zresult2 = sql_query("SELECT flagvalue FROM flags WHERE flagname = 'rebuild_zones'");
+	if(count($zresult1) == 0 && !$zresult2[0]['flagvalue']) {
 		$committext = "Commit changes";
 	}
 	else {
 		$committext = "<FONT COLOR=\"#FF0000\">Commit changes</FONT>";
 	}
 
-	if(count($zresult) == 0 && bad_records($userid)) {
+	if(count($zresult1) == 0 && bad_records($userid)) {
 		$maintext = "<FONT COLOR=\"#FF0000\">Main</FONT>";
 	}
 	else {
