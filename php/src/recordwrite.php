@@ -24,10 +24,10 @@ if((filter("num", $_GET['i'])) &&
 	$total = $_POST['total'];
 	if($total != 0) {
 		for($x = 0; $x < $total; $x++) {
-			if(! $_POST['host'][$x]) {
+			if(! strlen($_POST['host'][$x])) {
 				$_POST['host'][$x] = "@";
 			}
-			if(! $_POST['destination'][$x]) {
+			if(! strlen($_POST['destination'][$x])) {
 				$_POST['destination'][$x] = "@";
 			}
 			$destination = preg_replace("/\.$/", "", $_POST['destination'][$x]);
@@ -66,10 +66,10 @@ if((filter("num", $_GET['i'])) &&
 		}
 	}
 	if(($_POST['newhost']) || ($_POST['newdestination'])) {
-		if(! $_POST['newhost']) {
+		if(! strlen($_POST['newhost'])) {
 			$_POST['newhost'] = "@";
 		}
-		elseif(! $_POST['newdestination']) {
+		if(! strlen($_POST['newdestination'])) {
 			$_POST['newdestination'] = "@";
 		}
 		$res = $dbconnect->query("INSERT INTO records " .
