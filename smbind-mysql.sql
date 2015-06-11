@@ -96,6 +96,7 @@ INSERT INTO options VALUES ('MAILB','record','off');
 INSERT INTO options VALUES ('500_prins','normal','ns1.domain.tld');
 INSERT INTO options VALUES ('501_secns','normal','ns2.domain.tld');
 INSERT INTO options VALUES ('502_terns','normal','ns3.domain.tld');
+insert into options values ('509_nsttl', 'normal', '86400');
 INSERT INTO options VALUES ('510_hostmaster','normal','hostmaster.domain.tld');
 INSERT INTO options VALUES ('650_range','normal','100');
 

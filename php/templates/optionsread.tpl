@@ -25,6 +25,7 @@
 {if $options[prefkey].prefkey == "500_prins"}Default Primary NS{/if}
 {if $options[prefkey].prefkey == "501_secns"}Default Secondary NS{/if}
 {if $options[prefkey].prefkey == "502_terns"}Default Tertiary NS{/if}
+{if $options[prefkey].prefkey == "509_nsttl"}TTL for default NS records{/if}
 {if $options[prefkey].prefkey == "650_range"}Items Per Page{/if}
 </strong></font></td>
 	<td align="left"><input type="text" size="35" name="{$options[prefkey].prefkey}" value="{$options[prefkey].prefval}"></td>

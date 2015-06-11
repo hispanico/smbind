@@ -283,6 +283,13 @@ function sql_config($_CONF, $dbconnect) {
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
+			   "WHERE prefkey = '509_nsttl' " .
+			   "AND preftype = 'normal'"
+		 );
+	$_CONF['ns_ttl'] = $query[0]['prefval'];
+
+	$query = sql_query("SELECT prefval " .
+			   "FROM options " .
 			   "WHERE prefkey = '650_range' " .
 			   "AND preftype = 'normal'"
 		);
