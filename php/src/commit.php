@@ -3,6 +3,7 @@ if(!function_exists("is_admin")) { include("include.php"); }
 
 $rebuildq = sql_query("SELECT flagvalue FROM flags WHERE flagname = 'rebuild_zones'");
 $rebuild = $rebuildq[0]['flagvalue'];
+$zone_error = false;
 
 $zoneres = $dbconnect->query("SELECT * FROM zones WHERE updated = 'yes'");
 is_error($zoneres);
@@ -87,13 +88,15 @@ while($zone = $zoneres->fetchrow(DB_FETCHMODE_ASSOC)) {
 		}
 	}
 	else {
+		$zone_error = true;
 		$updateres = $dbconnect->query("UPDATE zones SET updated = 'yes', valid = 'no' " .
 						"WHERE id = " . $zone['id']);
 		is_error($updateres);
 	}
 }
 
-if ($rebuild) {
+$slave_message = '';
+if ($rebuild && !$zone_error) {
 	$zones =& $dbconnect->getAll("SELECT name FROM zones ORDER BY name", null, DB_FETCHMODE_ORDERED);
 	is_error($zones);
 
@@ -146,6 +149,10 @@ if ($rebuild) {
 		is_error($rebuildres);
 	}
 }
+if ($zone_error && $rebuild) {
+	$slave_message = 'WARNING: Slave update skipped due to zone errors';
+}
+
 $smarty->assign("bad", bad_records($userid));
 $smarty->assign("output", $output);
 $smarty->assign("slave", $slave_message);
