@@ -3,7 +3,7 @@ if(!function_exists('is_admin')) { include("include.php"); }
 
 if(is_admin()) { 
    $smarty->assign("zonelist", 
-	sql_query("SELECT id, name, serial, updated, valid " .
+	sql_query("SELECT id, name, serial, comment, updated, valid " .
 		  "FROM zones " .
 		  "ORDER BY name " .
 		  limit())
@@ -14,7 +14,7 @@ if(is_admin()) {
 }       
 else {  
    $smarty->assign("zonelist", 
-	sql_query("SELECT id, name, serial, updated, valid " .
+	sql_query("SELECT id, name, serial, comment updated, valid " .
 		  "FROM zones " . 
 		  "WHERE owner = $userid " . 
 		  "ORDER BY name " .

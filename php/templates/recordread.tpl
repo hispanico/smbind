@@ -21,6 +21,10 @@
     <td><input type="text" name="nttl" size="25" class="a1" value="{$zone.nttl}"></td>
   </tr>
   <tr>
+    <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Default TTL:</strong></font></div></td>
+    <td><input type="text" name="ttl" size="25" class="a1" value="{$zone.ttl}"></td>
+  </tr>
+  <tr>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS1:</strong></font></div></td>
     <td><input type="text" name="pri_dns" size="25" class="a1" value="{$zone.pri_dns}"></td>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS2:</strong></font></div></td>
@@ -29,11 +33,11 @@
 <tr>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS3:</strong></font></div></td>
     <td><input type="text" name="ter_dns" size="25" class="a1" value="{$zone.ter_dns}"></td>
-    <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Default TTL:</strong></font></div></td>
-    <td><input type="text" name="ttl" size="25" class="a1" value="{$zone.ttl}"></td>
+    <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS TTL:</strong></font></div></td>
+    <td><input type="text" name="ns_ttl" size="25" class="a1" value="{$zone.ns_ttl}"></td>
   </tr>
-  {if $admin == "yes"}
   <tr>
+  {if $admin == "yes"}
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Owner: </strong></font></div></td>
     <td><select name="owner" class="a1">
 	{section name=i loop=$userlist}
@@ -41,8 +45,14 @@
 	{/section}
 	</select>
 	</td>
-  </tr>
   {/if}
+	<td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Comment: </strong></font></div></td>
+	<td><input type="text" name="comment" size="25" class="a1" value="{$zone.comment|escape:'htmlall'}"></td>
+  </tr>
+    <tr>
+    <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Notes: </strong></font></div></td>
+    <td colspan="3"><textarea rows="3" name="notes" style="width: 100%">{$zone.notes|escape:'htmlall'}</textarea></td>
+  </tr>
   <tr>
     <td>&nbsp;</td>
     <td>&nbsp;</td>
@@ -79,7 +89,7 @@
     </td>
 {elseif $record[i].type == "TXT"}
     <td>
-	<input type="text" name="txt[{$smarty.section.i.index}]" class="a1" size="35" value="{$record[i].txt|escape:'htmlall'}">
+	<input type="text" name="txt[{$smarty.section.i.index}]" class="a1" size="36" value="{$record[i].txt|escape:'htmlall'}">
     </td>
 {elseif $record[i].type == "SRV"}
 	<td>
@@ -90,7 +100,7 @@
 	</td>
 {else}
     <td>
-	<input type="text" name="destination[{$smarty.section.i.index}]" class="a1" size="35" value="{$record[i].destination}">
+	<input type="text" name="destination[{$smarty.section.i.index}]" class="a1" size="36" value="{$record[i].destination}">
     </td>
 {/if}
     <td><center>

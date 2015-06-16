@@ -8,6 +8,7 @@ if((filter("num", $_GET['i'])) &&
    (filter("num", $_POST['expire'])) &&
    (filter("num", $_POST['ttl'])) &&
    (filter("num", $_POST['nttl'])) &&
+   (filter("num", $_POST['ns_ttl'])) &&
    (filter("alphanum", $_POST['pri_dns'])) &&
    (filter("alphanum", $_POST['sec_dns'])) &&
    (filter("alphanum", $_POST['ter_dns']))) {
@@ -107,7 +108,10 @@ if((filter("num", $_GET['i'])) &&
 				     "pri_dns = ?, " .
 				     "sec_dns = ?, " .
 				     "ter_dns = ?, " .
-				     "serial = ? " .
+				     "ns_ttl = ?, " .
+				     "serial = ?, " .
+				     "comment = ?, " .
+				     "notes = ? " .
 				 "WHERE id = ?",
 				 array($_POST['refresh'],
 					$_POST['retry'],
@@ -117,7 +121,10 @@ if((filter("num", $_GET['i'])) &&
 					preg_replace("/\.$/", "", $_POST['pri_dns']),
 					preg_replace("/\.$/", "", $_POST['sec_dns']),
 					preg_replace("/\.$/", "", $_POST['ter_dns']),
+					$_POST['ns_ttl'],
 					$serial,
+					$_POST['comment'],
+					$_POST['notes'],
 					$_GET['i']
 				)
 			);

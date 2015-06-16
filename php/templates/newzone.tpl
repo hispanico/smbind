@@ -1,5 +1,5 @@
 
-<form name="form1" method="post" action="./zonelist.php">
+<form name="form1" method="post" action="./zoneadd.php">
 <table width="320"  border="0">
   <tr>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Zone:</strong></font></div></td>
@@ -32,6 +32,10 @@
   <tr>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Tertiary NS:</strong></font></div></td>
     <td><input type="text" name="ter_dns" class="a1" value="{$ter_dns}"></td>
+  </tr>
+  <tr>
+    <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>NS TTL:</strong></font></div></td>
+    <td><input type="text" name="ns_ttl" class="a1" value="{$ns_ttl}"></td>
   </tr>
   <tr>
     <td><div align="right"><font face="Arial,Helvetica" size="-1"><strong>Web Server IP:</strong></font></div></td>

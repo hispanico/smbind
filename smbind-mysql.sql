@@ -30,6 +30,7 @@ CREATE TABLE zones (
   pri_dns varchar(255),
   sec_dns varchar(255),
   ter_dns varchar(255),
+  ns_ttl int NOT NULL DEFAULT 86400,
   serial int NOT NULL default 0000000000,
   refresh int NOT NULL default 604800,
   retry int NOT NULL default 86400,
@@ -39,8 +40,10 @@ CREATE TABLE zones (
   valid enum('unknown', 'yes', 'no') not null default 'unknown',
   owner int NOT NULL default 1,
   updated enum('yes', 'no') not null default 'yes',
+  comment varchar(40) DEFAULT NULL,
+  notes text,
   primary key(id)
-);
+) ROW_FORMAT=COMPRESSED;
 
 CREATE TABLE options (
   prefkey varchar(255) NOT NULL UNIQUE,

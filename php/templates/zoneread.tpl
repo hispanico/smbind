@@ -7,6 +7,7 @@
   <tr>
     <td><font size="-1" face="Arial,Helvetica"><strong>Name</strong></font></td>
     <td><font size="-1" face="Arial,Helvetica"><strong>Serial</strong></font></td>
+    <td><font size="-1" face="Arial,Helvetica"><strong>Comment</strong></font></td>
     <td><center><font size="-1" face="Arial,Helvetica"><strong>Changed</strong></font></center></td>
     <td><center><font size="-1" face="Arial,Helvetica"><strong>Valid</strong></font></center></td>
     <td><font size="-1" face="Arial,Helvetica"><strong>Delete</strong></font></td>
@@ -15,6 +16,7 @@
   <tr>
     <td><font size="-1" face="Arial,Helvetica"><a class="class" href="./record.php?i={$zonelist[i].id}">{$zonelist[i].name}</a></font></td>
     <td><font size="-1" face="Arial,Helvetica">{$zonelist[i].serial}</font></td>
+    <td><font size="-1" face="Arial,Helvetica">{$zonelist[i].comment}</font></td>
     <td><center><font size="-1">
 {if $zonelist[i].updated == "yes"}<IMG ALT="YES" WIDTH="20" HEIGHT="20" SRC="../images/yes.png">
 {elseif $zonelist[i].updated == "no"}<IMG ALT="NO" WIDTH="20" HEIGHT="20" SRC="../images/no.png">

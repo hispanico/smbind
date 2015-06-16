@@ -22,15 +22,14 @@ while($zone = $zoneres->fetchrow(DB_FETCHMODE_ASSOC)) {
 			" . $zone['expire'] . " \t; Expire
 			" . $zone['nttl'] . ")\t\t; Negative Cache TTL
 ;\n" ;
-	$nsttl = ctype_digit($_CONF['ns_ttl']) ? "\t".$_CONF['ns_ttl'] : '';
 	if ($zone['pri_dns'] != '') {
-		$out .= '@' . $nsttl ."\tNS\t\t" . $zone['pri_dns'] . ".\n";
+		$out .= "@\t" . $zone['ns_ttl'] ."\tNS\t\t" . $zone['pri_dns'] . ".\n";
 	}
 	if ($zone['sec_dns'] != '') {
-		$out .= '@' . $nsttl ."\tNS\t\t" . $zone['sec_dns'] . ".\n";
+		$out .= "@\t" . $zone['ns_ttl'] ."\tNS\t\t" . $zone['sec_dns'] . ".\n";
 	}
 	if ($zone['ter_dns'] != '') {
-		$out .= '@' . $nsttl ."\tNS\t\t" . $zone['ter_dns'] . ".\n";
+		$out .= "@\t" . $zone['ns_ttl'] ."\tNS\t\t" . $zone['ter_dns'] . ".\n";
 	}
 	$fd = fopen($_CONF['path'] . preg_replace('/\//','-',$zone['name']), "w")
 		or die("Cannot open: " . $_CONF['path'] . preg_replace('/\//','-',$zone['name']));
