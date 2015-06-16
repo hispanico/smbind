@@ -1,6 +1,13 @@
 <?php
 if(!function_exists("is_admin")) { include("include.php"); }
 
+$wclause='';
+if (isset($_GET['rname']) && preg_match('/^[a-z0-9._-]+$/i', $_GET['rname'])) {
+  $wclause=" AND ( ( host like '%" . $_GET['rname'] . "%' )" .
+    " OR (destination like '%" . $_GET['rname'] . "%' ) ) " ;
+
+}
+
 if(filter("num", $_GET['i'])) {
 	if(owner($_GET['i'])) {
 		$res = $dbconnect->query("SELECT * " .
@@ -15,12 +22,14 @@ if(filter("num", $_GET['i'])) {
 				sql_query("SELECT * " .
 					  "FROM records " .
 					  "WHERE zone = " . $_GET['i'] . " " .
+					  $wclause .
 					  "ORDER BY host, type, pri, destination " .
 					  limit())
 				);
 			pages("SELECT id " .
 			      "FROM records " .
-			      "WHERE zone = " . $_GET['i']
+			      "WHERE zone = " . $_GET['i'] .
+			      $wclause
 			     );
 			$smarty->assign("types", $_CONF['parameters']);
 			$smarty->assign("userlist",
@@ -31,7 +40,13 @@ if(filter("num", $_GET['i'])) {
 			$smarty->assign("template", "recordread.tpl");
 			$smarty->assign("help", help("recordread"));
 			$smarty->assign("menu_button", menu_buttons());
-			$smarty->assign("page_root", "./record.php?i=" . $_GET['i'] . "&amp;");
+			if (isset($_GET['rname'])) {
+			  $smarty->assign('rname', $_GET['rname']);
+			  $page_root = '?i=' . $_GET['i'] . '&rname=' . $_GET['rname'] . '&';
+			} else {
+			  $page_root= '?i=' . $_GET['i'] . '&';
+			}
+			$smarty->assign("page_root", $page_root);
 			$smarty->display("main.tpl");
 		}
 	}

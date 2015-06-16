@@ -1,4 +1,12 @@
-{include file="pages.tpl"}
+<form name="rsearch" method="get" style="display: inline">
+ <font face="Arial,Helvetica" size="-1">
+  <input name="rname" type="text" size="16" {if isset($rname)} value="{$rname}" {/if} />
+  <input name="i" type="hidden" value="{$zone.id}" />
+  <input type="submit" value="Search Record">
+ </font>
+</form>
+<a class="class" href="?i={$zone.id}">Clear search</a>
+<br />
 <form name="form1" method="post" action="./record.php?i={$zone.id}">
 <table border="0" cellpadding="0" cellspacing="3">
   <tr>
@@ -61,6 +69,9 @@
 
 <input type="hidden" name="zone" value="{$zone.name}">
 <input type="hidden" name="zoneid" value="{$zone.id}">
+
+{include file="pages.tpl"}
+
 <table border="0" cellpadding="0" cellspacing="3">
   <tr>
     <td><font face="Arial,Helvetica" size="-1"><strong>Host</strong></font></td>
