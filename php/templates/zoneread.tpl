@@ -2,6 +2,13 @@
 <font size="-1" face="Arial,Helvetica">
 <a class="class" href="./newzone.php">Create a new zone</a>
 </font>
+&nbsp;&nbsp;&bull;&nbsp;&nbsp;
+<form name="zsearch" method="get" style="display: inline">
+<input name="zone_search" type="text" {if isset($zone_search)} value="{$zone_search}" {/if} />
+<input type="submit" value="Search" />
+</form>
+&nbsp;&nbsp;&bull;&nbsp;&nbsp;
+<a class="class" href="?">Clear search</a>
 <br><br>
 <table width="100%"  border="0" cellspacing="1">
   <tr>
