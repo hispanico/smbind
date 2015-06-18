@@ -14,6 +14,7 @@ if(is_admin()) {
 	   (filter("num", $_POST['www'])) &&
 	   (filter("num", $_POST['mail'])) &&
 	   (filter("num", $_POST['ftp']))) {
+		$_POST['name'] = strtolower($_POST['name']);
 		$res = $dbconnect->query("SELECT id " .
 					 "FROM zones " .
 					 "WHERE name = '" . preg_replace("/\.$/", "", $_POST['name']) . "'"
