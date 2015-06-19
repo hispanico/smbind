@@ -56,13 +56,13 @@ if(is_admin()) {
 function bad_records($userid) {
 	$return = array();
 	if(is_admin()) {
-		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes';");
+		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes' AND deleted != 'yes'");
 		if($zresult) {
 			array_push($return, array('id' => $zresult[0]['id'], 'name' => $zresult[0]['name']));
 		}
 	}
 	else {
-		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes' AND owner = " . $userid);
+		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes' AND deleted != 'yes' AND owner = " . $userid);
 		if($zresult) {
 			array_push($return, array('id' => $zresult[0]['id'], 'name' => $zresult[0]['name']));
 		}
@@ -180,7 +180,7 @@ function reason($reason) {
 		return "You may not delete the default admin user.";
 	}
 	elseif($reason == "filenotdelete") {
-		return "The zone file can't delete from file system.";
+		return "Couldn't delete zone file from file system.";
 	}
 	else {
 		return "An unknown error ocurred.";
@@ -255,28 +255,42 @@ function notadmin($smarty) {
 function sql_config($_CONF, $dbconnect) {
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'hostmaster' " .
+			   "WHERE prefkey = '510_hostmaster' " .
 			   "AND preftype = 'normal'"
 		);
 	$_CONF['hostmaster'] = $query[0]['prefval'];
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'prins' " .
+			   "WHERE prefkey = '500_prins' " .
 			   "AND preftype = 'normal'"
 		 );
 	$_CONF['pri_dns'] = $query[0]['prefval'];
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'secns' " .
+			   "WHERE prefkey = '501_secns' " .
 			   "AND preftype = 'normal'"
 		 );
 	$_CONF['sec_dns'] = $query[0]['prefval'];
 
 	$query = sql_query("SELECT prefval " .
 			   "FROM options " .
-			   "WHERE prefkey = 'range' " .
+			   "WHERE prefkey = '502_terns' " .
+			   "AND preftype = 'normal'"
+		 );
+	$_CONF['ter_dns'] = $query[0]['prefval'];
+
+	$query = sql_query("SELECT prefval " .
+			   "FROM options " .
+			   "WHERE prefkey = '509_nsttl' " .
+			   "AND preftype = 'normal'"
+		 );
+	$_CONF['ns_ttl'] = $query[0]['prefval'];
+
+	$query = sql_query("SELECT prefval " .
+			   "FROM options " .
+			   "WHERE prefkey = '650_range' " .
 			   "AND preftype = 'normal'"
 		);
 	if($query) {
@@ -286,7 +300,7 @@ function sql_config($_CONF, $dbconnect) {
 		global $dbconnect;
         	$res = $dbconnect->query("INSERT INTO options " .
 					 "(prefkey, preftype, prefval) " .
-					 "VALUES ('range', 'normal', '10')"
+					 "VALUES ('650_range', 'normal', '10')"
 					);
 		is_error($res);
 	}
@@ -315,15 +329,16 @@ function sql_config($_CONF, $dbconnect) {
 function menu_buttons() {
 	global $userid;
 
-	$zresult = sql_query("SELECT id FROM zones WHERE updated = 'yes'");
-	if(count($zresult) == 0) {
+	$zresult1 = sql_query("SELECT id FROM zones WHERE updated = 'yes'");
+	$zresult2 = sql_query("SELECT flagvalue FROM flags WHERE flagname = 'rebuild_zones'");
+	if(count($zresult1) == 0 && !$zresult2[0]['flagvalue']) {
 		$committext = "Commit changes";
 	}
 	else {
 		$committext = "<FONT COLOR=\"#FF0000\">Commit changes</FONT>";
 	}
 
-	if(count($zresult) == 0 && bad_records($userid)) {
+	if(count($zresult1) == 0 && bad_records($userid)) {
 		$maintext = "<FONT COLOR=\"#FF0000\">Main</FONT>";
 	}
 	else {

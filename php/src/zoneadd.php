@@ -7,11 +7,14 @@ if(is_admin()) {
 	   (filter("num", $_POST['retry'], "no")) &&
 	   (filter("num", $_POST['expire'], "no")) &&
 	   (filter("num", $_POST['ttl'], "no")) &&
+	   (filter("num", $_POST['ns_ttl'], "no")) &&
 	   (filter("alphanum", $_POST['pri_dns'])) &&
 	   (filter("alphanum", $_POST['sec_dns'])) &&
+	   (filter("alphanum", $_POST['ter_dns'])) &&
 	   (filter("num", $_POST['www'])) &&
 	   (filter("num", $_POST['mail'])) &&
 	   (filter("num", $_POST['ftp']))) {
+		$_POST['name'] = strtolower($_POST['name']);
 		$res = $dbconnect->query("SELECT id " .
 					 "FROM zones " .
 					 "WHERE name = '" . preg_replace("/\.$/", "", $_POST['name']) . "'"
@@ -38,7 +41,7 @@ if(is_admin()) {
 		}
 		if($res->numRows() == 0) {
 			$res = $dbconnect->query("INSERT INTO zones " .
-							"(name, pri_dns, sec_dns, " .
+							"(name, pri_dns, sec_dns, ter_dns, ns_ttl, " .
 							"serial, refresh, retry, " .
 							"expire, ttl, owner, " .
 							"updated) " .
@@ -46,6 +49,8 @@ if(is_admin()) {
 							"'" . preg_replace("/\.$/", "", $_POST['name']) . "', " .
 							"'" . preg_replace("/\.$/", "", $_POST['pri_dns']) . "', " .
 							"'" . preg_replace("/\.$/", "", $_POST['sec_dns']) . "', " .
+							"'" . preg_replace("/\.$/", "", $_POST['ter_dns']) . "', " .
+							$_POST['ns_ttl'] . ", " .
 							date("Ymd") . "00, " .
 							$_POST['refresh'] . ", " .
 							$_POST['retry'] . ", " .
@@ -55,6 +60,17 @@ if(is_admin()) {
 							"'yes')"
 					   );
 			is_error($res);
+
+			$rebuildres = $dbconnect->query('update flags set flagvalue=1 where flagname="rebuild_zones"');
+			is_error($rebuildres);
+
+			$res = $dbconnect->query("SELECT id " .
+						 "FROM zones " .
+						 "WHERE name = '" . preg_replace("/\.$/", "", $_POST['name']) . "'"
+					   );
+			is_error($res);
+			$new_zone_row = $res->fetchRow();
+			$new_zone_id = $new_zone_row[0];
 
 			// Handle default records: Get new zone id
 			if(isset($_POST['www']) || isset($_POST['mail']) || isset($_POST['ftp'])) {
@@ -148,6 +164,11 @@ if(is_admin()) {
 else {
 	// The user is not an administrator.
 	notadmin($smarty);
+}
+
+if ($new_zone_id) {
+	$_GET['i'] = $new_zone_id;
+	include("recordread.php");
 }
 
 ?>

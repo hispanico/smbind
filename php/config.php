@@ -17,9 +17,26 @@ $_CONF['conf']		= "/etc/smbind/smbind.conf"; # Include this file in named.conf.
 // Zone data paths (chroot).
 #$_CONF['path']		= "/var/named/chroot/var/named/";
 #$_CONF['conf']		= "/var/named/chroot/etc/smbind/smbind.conf"; # Include this file in named.conf.
-                                                                                                               
-// BIND utilities. 
-$_CONF['namedcheckconf'] = "/usr/sbin/named-checkconf"; 
-$_CONF['namedcheckzone'] = "/usr/sbin/named-checkzone"; 
+
+// Slaves
+$_CONF['conf_slave'] = "/etc/smbind/smbind-slave.conf"; #create locally at this path, and push to this remote path
+$_CONF['slaves'] = array(
+	// master address (e.g. this host):
+	'10.10.20.1' => array(
+		// slaves pulling from this master
+		'172.16.10.1',
+		'172.16.10.2',
+		'172.16.20.10',
+	),
+);
+$_CONF['slave_ssh_key'] = '/etc/smbind/id_ed25519'; #ssh private key used to connect to slaves
+$_CONF['slave_user'] = 'smbind'; #ssh user on slave
+$_CONF['ssh'] = '/usr/bin/ssh';
+$_CONF['ssh_connect_timeout'] = 5;
+$_CONF['ssh_activity_timeout'] = 10;
+
+// BIND utilities.
+$_CONF['namedcheckconf'] = "/usr/sbin/named-checkconf";
+$_CONF['namedcheckzone'] = "/usr/sbin/named-checkzone";
 $_CONF['rndc'] 	  	 = "/usr/sbin/rndc";
 ?>

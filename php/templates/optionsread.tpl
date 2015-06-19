@@ -21,10 +21,12 @@
 {section name=prefkey loop=$options}
 <tr>
 <td align="left"><font face="Arial,Helvetica" size="-0"><strong>
-{if $options[prefkey].prefkey == "hostmaster"}Site Hostmaster Address{/if}
-{if $options[prefkey].prefkey == "range"}Items Per Page{/if}
-{if $options[prefkey].prefkey == "prins"}Default Primary NS{/if}
-{if $options[prefkey].prefkey == "secns"}Default Secondary NS{/if}
+{if $options[prefkey].prefkey == "510_hostmaster"}Site Hostmaster Address{/if}
+{if $options[prefkey].prefkey == "500_prins"}Default Primary NS{/if}
+{if $options[prefkey].prefkey == "501_secns"}Default Secondary NS{/if}
+{if $options[prefkey].prefkey == "502_terns"}Default Tertiary NS{/if}
+{if $options[prefkey].prefkey == "509_nsttl"}TTL for default NS records{/if}
+{if $options[prefkey].prefkey == "650_range"}Items Per Page{/if}
 </strong></font></td>
 	<td align="left"><input type="text" size="35" name="{$options[prefkey].prefkey}" value="{$options[prefkey].prefval}"></td>
 </tr>
