@@ -56,13 +56,13 @@ if(is_admin()) {
 function bad_records($userid) {
 	$return = array();
 	if(is_admin()) {
-		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes';");
+		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes' AND deleted != 'yes'");
 		if($zresult) {
 			array_push($return, array('id' => $zresult[0]['id'], 'name' => $zresult[0]['name']));
 		}
 	}
 	else {
-		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes' AND owner = " . $userid);
+		$zresult = sql_query("SELECT id, name FROM zones WHERE valid != 'yes' AND deleted != 'yes' AND owner = " . $userid);
 		if($zresult) {
 			array_push($return, array('id' => $zresult[0]['id'], 'name' => $zresult[0]['name']));
 		}

@@ -2,15 +2,15 @@
 if(!function_exists("is_admin")) { include("include.php"); }
 
 if(is_admin()) {
-	$res = $dbconnect->query("SELECT id FROM zones");
+	$res = $dbconnect->query("SELECT id FROM zones WHERE deleted != 'yes'");
 	is_error($res);
 	$zones = $res->numRows();
 	$smarty->assign("admin", "yes");
 }
 else {
 	$res = $dbconnect->query("SELECT id FROM zones " .
-	 			 "WHERE owner = " . $userid
-			   );
+		"WHERE owner = " . $userid . " AND deleted != 'yes'"
+	);
 	is_error($res);
 	$zones = $res->numRows();
 	$smarty->assign("admin", "no");

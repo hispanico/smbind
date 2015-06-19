@@ -31,6 +31,9 @@ $_CONF['slaves'] = array(
 );
 $_CONF['slave_ssh_key'] = '/etc/smbind/id_ed25519'; #ssh private key used to connect to slaves
 $_CONF['slave_user'] = 'smbind'; #ssh user on slave
+$_CONF['ssh'] = '/usr/bin/ssh';
+$_CONF['ssh_connect_timeout'] = 5;
+$_CONF['ssh_activity_timeout'] = 10;
 
 // BIND utilities.
 $_CONF['namedcheckconf'] = "/usr/sbin/named-checkconf";

@@ -40,6 +40,7 @@ CREATE TABLE zones (
   valid enum('unknown', 'yes', 'no') not null default 'unknown',
   owner int NOT NULL default 1,
   updated enum('yes', 'no') not null default 'yes',
+  deleted enum('yes','no') NOT NULL DEFAULT 'no',
   comment varchar(40) DEFAULT NULL,
   notes text,
   primary key(id)
